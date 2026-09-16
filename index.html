@@ -199,6 +199,36 @@
     min-width:52px;
   }
   .hidden{display:none !important;}
+  .note-row{
+    display:flex;
+    gap:8px;
+  }
+  .note-row input{
+    flex:1;
+    border:1.5px solid var(--menthe);
+    border-radius:12px;
+    padding:10px 12px;
+    font-size:.9rem;
+    font-family:inherit;
+    color:var(--text);
+    outline:none;
+  }
+  .note-row input:focus{
+    border-color:var(--verveine);
+  }
+  .note-row button{
+    border:none;
+    border-radius:12px;
+    padding:10px 16px;
+    background:var(--menthe);
+    color:white;
+    font-size:.9rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:background .2s ease;
+  }
+  .note-row button:hover{background:var(--verveine);}
+  .note-row button:disabled{opacity:.6;cursor:default;}
   footer{
     margin-top:22px;
     font-size:.75rem;
@@ -265,26 +295,12 @@
       </div>
 
       <div class="reply-section" id="replySection">
-        <p class="sub" style="margin-bottom:12px;">Any last words?</p>
-        <div class="days" id="replyButtons">
-          <button class="day reply-btn" data-reply="Yummy... can't wait, I'm so hungry (and for the food) 😏">
-            <span class="emoji">🤤</span>
-            <span class="txt"><span class="name">Yummy...</span><span class="pun">can't wait, I'm so hungry (and for the food)</span></span>
-          </button>
-          <button class="day reply-btn" data-reply="Pack your appetite, I'm bringing mine (both of them) 👀">
-            <span class="emoji">😏</span>
-            <span class="txt"><span class="name">Pack your appetite</span><span class="pun">I'm bringing mine (both of them)</span></span>
-          </button>
-          <button class="day reply-btn" data-reply="Dinner is just the appetizer 😉">
-            <span class="emoji">🍽️</span>
-            <span class="txt"><span class="name">Dinner is just</span><span class="pun">the appetizer</span></span>
-          </button>
-          <button class="day reply-btn" data-reply="Counting down the minutes till Fringe o'clock 🛋️">
-            <span class="emoji">⏰</span>
-            <span class="txt"><span class="name">Counting down</span><span class="pun">the minutes till Fringe o'clock</span></span>
-          </button>
+        <p class="sub" style="margin-bottom:10px;">Any last words? 💬</p>
+        <div class="note-row">
+          <input type="text" id="noteInput" maxlength="60" placeholder="I'm excited... / I love you...">
+          <button id="noteSend">Send</button>
         </div>
-        <p id="replyStatus" style="margin-top:14px;font-size:.85rem;color:#7fa89e;"></p>
+        <p id="replyStatus" style="margin-top:10px;font-size:.85rem;color:#7fa89e;"></p>
       </div>
     </div>
 
@@ -304,7 +320,8 @@
   const resultEmoji = document.getElementById('resultEmoji');
   const resultRestaurant = document.getElementById('resultRestaurant');
   const resultLink = document.getElementById('resultLink');
-  const replyButtons = document.querySelectorAll('#replyButtons button.reply-btn');
+  const noteInput = document.getElementById('noteInput');
+  const noteSend = document.getElementById('noteSend');
   const replyStatus = document.getElementById('replyStatus');
 
   let currentRowId = null;
@@ -347,33 +364,37 @@
     });
   });
 
-  replyButtons.forEach(btn => {
-    btn.addEventListener('click', async () => {
-      replyButtons.forEach(b => b.disabled = true);
-      replyStatus.textContent = "Sending...";
-      const reply = btn.dataset.reply;
+  async function sendNote() {
+    const reply = noteInput.value.trim();
+    if (!reply) return;
 
-      try {
-        if (currentRowId) {
-          await fetch(`${SUPABASE_URL}/rest/v1/date_responses?id=eq.${currentRowId}`, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              "apikey": SUPABASE_ANON_KEY,
-              "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-              "Prefer": "return=minimal"
-            },
-            body: JSON.stringify({ reply })
-          });
-        }
-      } catch (e) {
-        // still show confirmation even if the network hiccups
+    noteSend.disabled = true;
+    noteInput.disabled = true;
+    replyStatus.textContent = "Sending...";
+
+    try {
+      if (currentRowId) {
+        await fetch(`${SUPABASE_URL}/rest/v1/date_responses?id=eq.${currentRowId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify({ reply })
+        });
       }
+    } catch (e) {
+      // still show confirmation even if the network hiccups
+    }
 
-      replyStatus.textContent = "Sent 💌";
-      document.getElementById('replySection').classList.add('sent');
-      replyButtons.forEach(b => b.style.display = 'none');
-    });
+    replyStatus.textContent = "Sent 💌";
+  }
+
+  noteSend.addEventListener('click', sendNote);
+  noteInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendNote();
   });
 
   // "No" button runs away from the cursor — there is no acceptable "no" here
