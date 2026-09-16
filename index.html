@@ -6,11 +6,11 @@
 <title>A Question For You 💌</title>
 <style>
   :root{
-    --pink:#ffd6e8;
-    --pink-deep:#ff8fb3;
-    --peach:#ffe0c2;
-    --lavender:#e3d6ff;
-    --text:#5b3a52;
+    --brume:#C2F2E4;
+    --menthe:#35C8B4;
+    --limonade:#EDF7BE;
+    --verveine:#A4CF4A;
+    --text:#2d4a44;
   }
   *{box-sizing:border-box;}
   body{
@@ -20,10 +20,12 @@
     align-items:center;
     justify-content:center;
     font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
-    background:linear-gradient(135deg,var(--pink) 0%,var(--peach) 50%,var(--lavender) 100%);
+    background:linear-gradient(135deg,var(--brume) 0%,var(--menthe) 35%,var(--limonade) 70%,var(--verveine) 100%);
     background-size:200% 200%;
     animation:drift 12s ease infinite;
     padding:20px;
+    position:relative;
+    overflow:hidden;
   }
   @keyframes drift{
     0%{background-position:0% 50%;}
@@ -31,15 +33,17 @@
     100%{background-position:0% 50%;}
   }
   .card{
-    background:rgba(255,255,255,0.85);
+    background:rgba(255,255,255,0.88);
     backdrop-filter:blur(6px);
     border-radius:28px;
     max-width:480px;
     width:100%;
     padding:40px 32px;
     text-align:center;
-    box-shadow:0 20px 50px rgba(255,143,179,0.35);
+    box-shadow:0 20px 50px rgba(53,200,180,0.35);
     animation:pop .6s ease;
+    position:relative;
+    z-index:1;
   }
   @keyframes pop{
     from{transform:scale(.9);opacity:0;}
@@ -56,7 +60,7 @@
     margin-bottom:6px;
   }
   p.sub{
-    color:#8a6a80;
+    color:#4f6b64;
     margin:10px 0 26px;
     font-size:1rem;
   }
@@ -74,7 +78,7 @@
     font-size:1rem;
     font-weight:600;
     cursor:pointer;
-    box-shadow:0 6px 14px rgba(255,143,179,0.25);
+    box-shadow:0 6px 14px rgba(53,200,180,0.25);
     transition:transform .15s ease, box-shadow .15s ease, background .2s ease;
     line-height:1.35;
   }
@@ -92,16 +96,38 @@
     display:block;
     font-size:.82rem;
     font-weight:400;
-    color:#a4849b;
+    color:#6a8a82;
   }
   button.day:hover{
     transform:translateY(-4px) scale(1.03);
-    background:var(--pink-deep);
+    background:var(--menthe);
     color:white;
-    box-shadow:0 10px 22px rgba(255,143,179,0.45);
+    box-shadow:0 10px 22px rgba(53,200,180,0.45);
   }
-  button.day:hover .pun{color:#ffe6ee;}
+  button.day:hover .pun{color:#eafff9;}
   button.day:active{transform:scale(.97);}
+
+  .no-wrap{
+    margin-top:22px;
+    height:54px;
+    position:relative;
+  }
+  #noBtn{
+    position:absolute;
+    top:0;
+    left:50%;
+    transform:translateX(-50%);
+    border:2px solid var(--verveine);
+    background:white;
+    color:var(--verveine);
+    border-radius:16px;
+    padding:12px 22px;
+    font-size:.95rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:top .12s ease, left .12s ease;
+  }
+
   .result{
     display:none;
   }
@@ -119,14 +145,14 @@
     font-size:1.4rem;
   }
   .result p{
-    color:#8a6a80;
+    color:#4f6b64;
     margin:0;
   }
   .hidden{display:none !important;}
   footer{
     margin-top:22px;
     font-size:.75rem;
-    color:#c79ab8;
+    color:#7fa89e;
   }
 </style>
 </head>
@@ -158,7 +184,12 @@
           <span class="pun">Donut leave me hanging</span>
         </button>
       </div>
-      <p id="status" style="margin-top:16px;font-size:.85rem;color:#c79ab8;"></p>
+
+      <div class="no-wrap">
+        <button id="noBtn">No 🙃</button>
+      </div>
+
+      <p id="status" style="margin-top:16px;font-size:.85rem;color:#7fa89e;"></p>
     </div>
 
     <div class="result" id="result">
@@ -171,8 +202,8 @@
   </div>
 
 <script>
-  // Sends his pick straight to Naomi's WhatsApp — no backend, no signup needed
-  const WHATSAPP_NUMBER = "27767407241";
+  // TODO: replace with real Supabase endpoint once backend is provisioned
+  const SUBMIT_ENDPOINT = "SUPABASE_ENDPOINT_PLACEHOLDER";
 
   const buttons = document.querySelectorAll('button.day');
   const status = document.getElementById('status');
@@ -183,26 +214,57 @@
   const resultEmoji = document.getElementById('resultEmoji');
 
   buttons.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       buttons.forEach(b => b.disabled = true);
-      status.textContent = "Opening WhatsApp...";
+      status.textContent = "Sending...";
 
       const day = btn.dataset.day;
       const plan = btn.dataset.plan;
       const pun = btn.dataset.pun;
 
-      const message = `${pun} 🎉 I pick ${day}! (${plan})`;
-      const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-      window.open(waUrl, "_blank");
+      try {
+        await fetch(SUBMIT_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ day, plan, answered_at: new Date().toISOString() })
+        });
+      } catch (e) {
+        // still show confirmation even if the network hiccups
+      }
 
       resultEmoji.textContent = "🎉";
       resultTitle.textContent = `${day} it is!`;
-      resultSub.textContent = `${pun} Just hit send in WhatsApp to confirm 💕`;
+      resultSub.textContent = `${pun} Can't wait — see you then 💕`;
 
       ask.classList.add('hidden');
       result.classList.add('show');
     });
   });
+
+  // "No" button runs away from the cursor — there is no acceptable "no" here
+  const noBtn = document.getElementById('noBtn');
+  const noWrap = document.querySelector('.no-wrap');
+
+  function dodge() {
+    const wrapRect = noWrap.getBoundingClientRect();
+    const btnW = noBtn.offsetWidth;
+    const btnH = noBtn.offsetHeight;
+    const maxLeft = Math.max(wrapRect.width - btnW, 0);
+    const maxTop = Math.max(40, 0); // small vertical wiggle room within the wrap
+
+    const newLeft = Math.random() * maxLeft;
+    const newTop = (Math.random() - 0.5) * 20;
+
+    noBtn.style.left = `${newLeft}px`;
+    noBtn.style.transform = "none";
+    noBtn.style.top = `${newTop}px`;
+  }
+
+  noBtn.addEventListener('mouseover', dodge);
+  noBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    dodge();
+  }, { passive: false });
 </script>
 </body>
 </html>
