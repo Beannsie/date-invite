@@ -171,7 +171,8 @@
   </div>
 
 <script>
-  const FORM_ENDPOINT = "FORMSPREE_ENDPOINT_PLACEHOLDER";
+  // Sends his pick straight to Naomi's WhatsApp — no backend, no signup needed
+  const WHATSAPP_NUMBER = "27767407241";
 
   const buttons = document.querySelectorAll('button.day');
   const status = document.getElementById('status');
@@ -182,31 +183,21 @@
   const resultEmoji = document.getElementById('resultEmoji');
 
   buttons.forEach(btn => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', () => {
       buttons.forEach(b => b.disabled = true);
-      status.textContent = "Sending...";
+      status.textContent = "Opening WhatsApp...";
 
       const day = btn.dataset.day;
       const plan = btn.dataset.plan;
       const pun = btn.dataset.pun;
 
-      try {
-        await fetch(FORM_ENDPOINT, {
-          method: "POST",
-          headers: { "Accept": "application/json", "Content-Type": "application/json" },
-          body: JSON.stringify({
-            day: day,
-            plan: plan,
-            message: `He picked ${day}! (${plan})`
-          })
-        });
-      } catch (e) {
-        // still show confirmation even if network hiccups
-      }
+      const message = `${pun} 🎉 I pick ${day}! (${plan})`;
+      const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+      window.open(waUrl, "_blank");
 
       resultEmoji.textContent = "🎉";
       resultTitle.textContent = `${day} it is!`;
-      resultSub.textContent = `${pun} Can't wait — see you then 💕`;
+      resultSub.textContent = `${pun} Just hit send in WhatsApp to confirm 💕`;
 
       ask.classList.add('hidden');
       result.classList.add('show');
