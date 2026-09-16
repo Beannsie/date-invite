@@ -229,6 +229,20 @@
   }
   .note-row button:hover{background:var(--verveine);}
   .note-row button:disabled{opacity:.6;cursor:default;}
+  .back-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:none;
+    border:none;
+    color:#4f6b64;
+    font-size:.85rem;
+    font-weight:600;
+    cursor:pointer;
+    padding:0 0 16px;
+    margin:0;
+  }
+  .back-btn:hover{color:var(--menthe);}
   footer{
     margin-top:22px;
     font-size:.75rem;
@@ -274,6 +288,7 @@
     </div>
 
     <div class="result" id="result">
+      <button id="backBtn" class="back-btn">← Pick a different night</button>
       <div class="big" id="resultEmoji">🎉</div>
       <h2 id="resultTitle"></h2>
       <p class="pun-line" id="resultPun"></p>
@@ -324,8 +339,41 @@
   const noteInput = document.getElementById('noteInput');
   const noteSend = document.getElementById('noteSend');
   const replyStatus = document.getElementById('replyStatus');
+  const backBtn = document.getElementById('backBtn');
 
   let currentRowId = null;
+
+  function showAsk(pushHistory) {
+    result.classList.remove('show');
+    ask.classList.remove('hidden');
+    buttons.forEach(b => b.disabled = false);
+    status.textContent = "";
+    if (pushHistory !== false) {
+      history.pushState({ view: 'ask' }, '', '#');
+    }
+  }
+
+  function showResult() {
+    ask.classList.add('hidden');
+    result.classList.add('show');
+    history.pushState({ view: 'result' }, '', '#plan');
+  }
+
+  // Establish a base history entry so the very first Back press has somewhere to land
+  history.replaceState({ view: 'ask' }, '', '#');
+
+  window.addEventListener('popstate', (e) => {
+    const view = e.state && e.state.view;
+    if (view === 'result') {
+      ask.classList.add('hidden');
+      result.classList.add('show');
+    } else {
+      ask.classList.remove('hidden');
+      result.classList.remove('show');
+    }
+  });
+
+  backBtn.addEventListener('click', () => showAsk());
 
   buttons.forEach(btn => {
     btn.addEventListener('click', async () => {
@@ -360,8 +408,7 @@
       resultRestaurant.textContent = restaurant;
       resultLink.href = link;
 
-      ask.classList.add('hidden');
-      result.classList.add('show');
+      showResult();
     });
   });
 
