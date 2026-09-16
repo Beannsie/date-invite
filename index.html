@@ -345,7 +345,7 @@
   const replyStatus = document.getElementById('replyStatus');
   const backBtn = document.getElementById('backBtn');
 
-  let currentRowId = null;
+  let currentToken = null;
 
   function showAsk(pushHistory) {
     result.classList.remove('show');
@@ -389,19 +389,19 @@
       const link = btn.dataset.link;
       const pun = btn.dataset.pun;
 
+      currentToken = crypto.randomUUID();
+
       try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/date_responses`, {
+        await fetch(`${SUPABASE_URL}/rest/v1/date_responses`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "apikey": SUPABASE_ANON_KEY,
             "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-            "Prefer": "return=representation"
+            "Prefer": "return=minimal"
           },
-          body: JSON.stringify({ day, plan: restaurant })
+          body: JSON.stringify({ day, plan: restaurant, token: currentToken })
         });
-        const rows = await res.json();
-        if (Array.isArray(rows) && rows[0]) currentRowId = rows[0].id;
       } catch (e) {
         // still show confirmation even if the network hiccups
       }
@@ -425,16 +425,15 @@
     replyStatus.textContent = "Sending...";
 
     try {
-      if (currentRowId) {
-        await fetch(`${SUPABASE_URL}/rest/v1/date_responses?id=eq.${currentRowId}`, {
-          method: "PATCH",
+      if (currentToken) {
+        await fetch(`${SUPABASE_URL}/rest/v1/rpc/submit_reply`, {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
             "apikey": SUPABASE_ANON_KEY,
-            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-            "Prefer": "return=minimal"
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
           },
-          body: JSON.stringify({ reply })
+          body: JSON.stringify({ p_token: currentToken, p_reply: reply })
         });
       }
     } catch (e) {
