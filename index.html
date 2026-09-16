@@ -114,10 +114,7 @@
     position:relative;
   }
   #noBtn{
-    position:absolute;
-    top:0;
-    left:50%;
-    transform:translateX(-50%);
+    position:fixed;
     border:2px solid var(--verveine);
     background:white;
     color:var(--verveine);
@@ -126,7 +123,8 @@
     font-size:.95rem;
     font-weight:600;
     cursor:pointer;
-    transition:top .12s ease, left .12s ease;
+    transition:top .08s linear, left .08s linear;
+    z-index:10;
   }
 
   .result{
@@ -323,25 +321,52 @@
   // "No" button runs away from the cursor — there is no acceptable "no" here
   const noBtn = document.getElementById('noBtn');
   const noWrap = document.querySelector('.no-wrap');
+  const DODGE_RADIUS = 140; // px — starts fleeing before the cursor even reaches it
+
+  function placeInitial() {
+    const wrapRect = noWrap.getBoundingClientRect();
+    noBtn.style.left = `${wrapRect.left + wrapRect.width / 2 - noBtn.offsetWidth / 2}px`;
+    noBtn.style.top = `${wrapRect.top}px`;
+  }
 
   function dodge() {
-    const wrapRect = noWrap.getBoundingClientRect();
     const btnW = noBtn.offsetWidth;
-    const maxLeft = Math.max(wrapRect.width - btnW, 0);
+    const btnH = noBtn.offsetHeight;
+    const maxLeft = Math.max(window.innerWidth - btnW - 10, 10);
+    const maxTop = Math.max(window.innerHeight - btnH - 10, 10);
 
-    const newLeft = Math.random() * maxLeft;
-    const newTop = (Math.random() - 0.5) * 20;
+    const newLeft = 10 + Math.random() * (maxLeft - 10);
+    const newTop = 10 + Math.random() * (maxTop - 10);
 
     noBtn.style.left = `${newLeft}px`;
-    noBtn.style.transform = "none";
     noBtn.style.top = `${newTop}px`;
   }
+
+  placeInitial();
+
+  // Proximity dodge: flee as soon as the cursor gets close, not just on direct hover
+  document.addEventListener('mousemove', (e) => {
+    const rect = noBtn.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+    if (dist < DODGE_RADIUS) dodge();
+  });
 
   noBtn.addEventListener('mouseover', dodge);
   noBtn.addEventListener('touchstart', (e) => {
     e.preventDefault();
     dodge();
   }, { passive: false });
+
+  // Last-resort safety net: if a click somehow lands, dodge instead of firing
+  noBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dodge();
+  });
+
+  window.addEventListener('resize', dodge);
 </script>
 </body>
 </html>
