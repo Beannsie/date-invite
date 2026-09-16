@@ -202,8 +202,8 @@
   </div>
 
 <script>
-  // TODO: replace with real Supabase endpoint once backend is provisioned
-  const SUBMIT_ENDPOINT = "SUPABASE_ENDPOINT_PLACEHOLDER";
+  const SUPABASE_URL = "https://qcvdhtzisctxbuvkqkyl.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_zMRHoAyH873hBziygAkf5Q_p_D9AU-q";
 
   const buttons = document.querySelectorAll('button.day');
   const status = document.getElementById('status');
@@ -223,10 +223,15 @@
       const pun = btn.dataset.pun;
 
       try {
-        await fetch(SUBMIT_ENDPOINT, {
+        await fetch(`${SUPABASE_URL}/rest/v1/date_responses`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ day, plan, answered_at: new Date().toISOString() })
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify({ day, plan })
         });
       } catch (e) {
         // still show confirmation even if the network hiccups
