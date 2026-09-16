@@ -36,7 +36,7 @@
     background:rgba(255,255,255,0.88);
     backdrop-filter:blur(6px);
     border-radius:28px;
-    max-width:480px;
+    max-width:520px;
     width:100%;
     padding:40px 32px;
     text-align:center;
@@ -51,7 +51,7 @@
   }
   h1{
     color:var(--text);
-    font-size:1.7rem;
+    font-size:1.6rem;
     margin:0 0 6px;
     line-height:1.3;
   }
@@ -61,18 +61,18 @@
   }
   p.sub{
     color:#4f6b64;
-    margin:10px 0 26px;
+    margin:10px 0 22px;
     font-size:1rem;
   }
   .days{
-    display:grid;
-    grid-template-columns:1fr 1fr;
+    display:flex;
+    flex-direction:column;
     gap:14px;
   }
   button.day{
     border:none;
     border-radius:18px;
-    padding:18px 12px;
+    padding:16px 18px;
     background:white;
     color:var(--text);
     font-size:1rem;
@@ -80,32 +80,33 @@
     cursor:pointer;
     box-shadow:0 6px 14px rgba(53,200,180,0.25);
     transition:transform .15s ease, box-shadow .15s ease, background .2s ease;
-    line-height:1.35;
+    text-align:left;
+    display:flex;
+    align-items:center;
+    gap:14px;
   }
   button.day .emoji{
-    display:block;
     font-size:1.8rem;
-    margin-bottom:6px;
+    flex-shrink:0;
   }
+  button.day .txt{display:flex;flex-direction:column;}
   button.day .name{
-    display:block;
     font-size:1.05rem;
-    margin-bottom:4px;
+    margin-bottom:2px;
   }
   button.day .pun{
-    display:block;
     font-size:.82rem;
     font-weight:400;
     color:#6a8a82;
   }
   button.day:hover{
-    transform:translateY(-4px) scale(1.03);
+    transform:translateY(-3px) scale(1.02);
     background:var(--menthe);
     color:white;
     box-shadow:0 10px 22px rgba(53,200,180,0.45);
   }
   button.day:hover .pun{color:#eafff9;}
-  button.day:active{transform:scale(.97);}
+  button.day:active{transform:scale(.98);}
 
   .no-wrap{
     margin-top:22px;
@@ -141,12 +142,63 @@
   }
   .result h2{
     color:var(--text);
-    margin:0 0 8px;
+    margin:0 0 6px;
     font-size:1.4rem;
   }
-  .result p{
+  .result .pun-line{
     color:#4f6b64;
+    margin:0 0 18px;
+  }
+  .restaurant-card{
+    background:var(--limonade);
+    border-radius:16px;
+    padding:16px 18px;
+    margin-bottom:18px;
+    text-align:left;
+  }
+  .restaurant-card .r-name{
+    font-weight:700;
+    color:var(--text);
+    font-size:1.05rem;
+    margin-bottom:4px;
+  }
+  .restaurant-card a{
+    color:#1f6b5c;
+    font-size:.88rem;
+    text-decoration:underline;
+  }
+  .schedule{
+    text-align:left;
+    background:white;
+    border-radius:16px;
+    padding:16px 18px;
+    box-shadow:0 4px 12px rgba(53,200,180,0.15);
+  }
+  .schedule h3{
+    margin:0 0 10px;
+    font-size:.95rem;
+    color:var(--text);
+    text-transform:uppercase;
+    letter-spacing:.03em;
+  }
+  .schedule ul{
+    list-style:none;
     margin:0;
+    padding:0;
+  }
+  .schedule li{
+    display:flex;
+    gap:10px;
+    padding:6px 0;
+    font-size:.92rem;
+    color:#3d5a54;
+    border-bottom:1px dashed #dcefe9;
+  }
+  .schedule li:last-child{border-bottom:none;}
+  .schedule .time{
+    font-weight:700;
+    color:var(--menthe);
+    min-width:52px;
   }
   .hidden{display:none !important;}
   footer{
@@ -159,29 +211,30 @@
 <body>
   <div class="card">
     <div id="ask">
-      <div class="headline">🍩🍕🍣🌮</div>
-      <h1>I'm soy into you...<br>wanna go for sushi?<br>(or tacos, or pizza, or donuts — you pick the day 😉)</h1>
-      <p class="sub">Pick a day and I'll pick the place:</p>
+      <div class="headline">🌮🍣🍝</div>
+      <h1>I'm soy into you...<br>wanna get away from the weekend crowds with me? 😉</h1>
+      <p class="sub">Pick a night and I'll pick the place:</p>
       <div class="days" id="dayButtons">
-        <button class="day" data-day="Thursday" data-plan="Taco night 🌮" data-pun="Lettuce taco 'bout Thursday">
+        <button class="day" data-day="Thursday" data-restaurant="Hacienda Coastal Mexican" data-link="https://hacienda.co.za/" data-pun="Lettuce taco 'bout Thursday">
           <span class="emoji">🌮</span>
-          <span class="name">Thursday</span>
-          <span class="pun">Lettuce taco 'bout it</span>
+          <span class="txt">
+            <span class="name">Thursday</span>
+            <span class="pun">Lettuce taco 'bout it</span>
+          </span>
         </button>
-        <button class="day" data-day="Friday" data-plan="Pizza night 🍕" data-pun="I dough-nut want to wait — Friday?">
-          <span class="emoji">🍕</span>
-          <span class="name">Friday</span>
-          <span class="pun">Let's not wait — pizza?</span>
-        </button>
-        <button class="day" data-day="Saturday" data-plan="Sushi date 🍣" data-pun="I'm soy into you — Saturday?">
+        <button class="day" data-day="Sunday" data-restaurant="Kyoto Garden" data-link="https://www.kyotogarden.co.za/" data-pun="I'm soy into you — Sunday?">
           <span class="emoji">🍣</span>
-          <span class="name">Saturday</span>
-          <span class="pun">I'm soy into this</span>
+          <span class="txt">
+            <span class="name">Sunday</span>
+            <span class="pun">I'm soy into this</span>
+          </span>
         </button>
-        <button class="day" data-day="Sunday" data-plan="Coffee & donuts ☕🍩" data-pun="Donut leave me hanging — Sunday?">
-          <span class="emoji">🍩</span>
-          <span class="name">Sunday</span>
-          <span class="pun">Donut leave me hanging</span>
+        <button class="day" data-day="Monday" data-restaurant="Arlecchino by tashas" data-link="https://www.dineplan.com/restaurants/arlecchino" data-pun="Let's steer clear of the weekend and pasta the time together — Monday?">
+          <span class="emoji">🍝</span>
+          <span class="txt">
+            <span class="name">Monday</span>
+            <span class="pun">Pasta-tively can't wait</span>
+          </span>
         </button>
       </div>
 
@@ -195,7 +248,23 @@
     <div class="result" id="result">
       <div class="big" id="resultEmoji">🎉</div>
       <h2 id="resultTitle"></h2>
-      <p id="resultSub"></p>
+      <p class="pun-line" id="resultPun"></p>
+
+      <div class="restaurant-card">
+        <div class="r-name" id="resultRestaurant"></div>
+        <a id="resultLink" href="#" target="_blank" rel="noopener">Check out the menu →</a>
+      </div>
+
+      <div class="schedule">
+        <h3>The plan</h3>
+        <ul>
+          <li><span class="time">19:00</span><span>Pre-drinks at home 🎶 (rap music, obviously)</span></li>
+          <li><span class="time">19:30</span><span>Dinner reservation</span></li>
+          <li><span class="time">21:00</span><span>Back home</span></li>
+          <li><span class="time">21:15</span><span>Fringe 📺</span></li>
+          <li><span class="time">22:15</span><span>Bowchikawowow 😏</span></li>
+        </ul>
+      </div>
     </div>
 
     <footer>made with 💗 just for you</footer>
@@ -210,8 +279,10 @@
   const ask = document.getElementById('ask');
   const result = document.getElementById('result');
   const resultTitle = document.getElementById('resultTitle');
-  const resultSub = document.getElementById('resultSub');
+  const resultPun = document.getElementById('resultPun');
   const resultEmoji = document.getElementById('resultEmoji');
+  const resultRestaurant = document.getElementById('resultRestaurant');
+  const resultLink = document.getElementById('resultLink');
 
   buttons.forEach(btn => {
     btn.addEventListener('click', async () => {
@@ -219,7 +290,8 @@
       status.textContent = "Sending...";
 
       const day = btn.dataset.day;
-      const plan = btn.dataset.plan;
+      const restaurant = btn.dataset.restaurant;
+      const link = btn.dataset.link;
       const pun = btn.dataset.pun;
 
       try {
@@ -231,7 +303,7 @@
             "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
             "Prefer": "return=minimal"
           },
-          body: JSON.stringify({ day, plan })
+          body: JSON.stringify({ day, plan: restaurant })
         });
       } catch (e) {
         // still show confirmation even if the network hiccups
@@ -239,7 +311,9 @@
 
       resultEmoji.textContent = "🎉";
       resultTitle.textContent = `${day} it is!`;
-      resultSub.textContent = `${pun} Can't wait — see you then 💕`;
+      resultPun.textContent = pun;
+      resultRestaurant.textContent = restaurant;
+      resultLink.href = link;
 
       ask.classList.add('hidden');
       result.classList.add('show');
@@ -253,9 +327,7 @@
   function dodge() {
     const wrapRect = noWrap.getBoundingClientRect();
     const btnW = noBtn.offsetWidth;
-    const btnH = noBtn.offsetHeight;
     const maxLeft = Math.max(wrapRect.width - btnW, 0);
-    const maxTop = Math.max(40, 0); // small vertical wiggle room within the wrap
 
     const newLeft = Math.random() * maxLeft;
     const newTop = (Math.random() - 0.5) * 20;
